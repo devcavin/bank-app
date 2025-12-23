@@ -1,1 +1,1 @@
-# Bank CLI APP
+# pesa-core
