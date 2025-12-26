@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: pesa-core
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/pesacoredb"
+    username: "postgres"
+    password: "secret"
+  jpa:
+    hibernate:
+      ddl-auto: update
