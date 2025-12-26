@@ -1,5 +1,6 @@
 package devcavin.pesacore.entity
 
+import devcavin.pesacore.utility.AccountUtility
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -20,9 +21,9 @@ class Account(
     @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
 
-    var accountNumber: String = "ACCOUNT_NUMBER-${UUID.randomUUID()}",
+    var accountNumber: String = AccountUtility.generateAccountNumber(),
 
-    var customerId: String = "CUSTOMER-${UUID.randomUUID()}",
+    var ownerId: String = AccountUtility.generateOwnerId(),
 
     @Digits(integer = 15, fraction = 4)
     @Column(precision = 19, scale = 4)
@@ -33,7 +34,7 @@ class Account(
 
     @CreationTimestamp
     @Column(updatable = false)
-    val createdAt: Instant? = null
+    var createdAt: Instant? = null
 
     @UpdateTimestamp
     var updatedAt: Instant? = null
@@ -48,6 +49,7 @@ class Account(
     override fun hashCode(): Int = javaClass.hashCode()
 
     override fun toString() =
-        "Account(id=$id, accountNumber='$accountNumber', customerId=$customerId, balance=$balance, currency='$currency', " +
+        "Account(id=$id, accountNumber='$accountNumber', ownerId=$ownerId, balance=$balance, currency='$currency'," +
+                " " +
                 "createdAt=$createdAt, updatedAt=$updatedAt)"
 }
