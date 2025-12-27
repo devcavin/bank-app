@@ -27,7 +27,7 @@ class Account(
 
     @Digits(integer = 15, fraction = 4)
     @Column(precision = 19, scale = 4)
-    var balance: BigDecimal,
+    var balance: BigDecimal? = null,
 
     var currency: String = "KES"
     ) {

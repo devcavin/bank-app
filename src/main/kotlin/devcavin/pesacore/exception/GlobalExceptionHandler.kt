@@ -3,6 +3,7 @@ package devcavin.pesacore.exception
 import devcavin.pesacore.dto.response.ErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
@@ -21,14 +22,30 @@ class GlobalExceptionHandler {
     }
 
     // Insufficient balance
-    @ExceptionHandler(InsufficientBalanceException::class)
-    fun handleInsufficientBalance(e: InsufficientBalanceException): ResponseEntity<ErrorResponse> {
+    @ExceptionHandler(InvalidAmountException::class, InsufficientFundsException::class)
+    fun handleBusinessExceptions(e: RuntimeException): ResponseEntity<ErrorResponse> {
         return ResponseEntity(
             ErrorResponse(
                 status = HttpStatus.BAD_REQUEST.value(),
                 error = HttpStatus.BAD_REQUEST.reasonPhrase,
                 message = e.message
-            ), HttpStatus.BAD_REQUEST
+            ),
+            HttpStatus.BAD_REQUEST
+        )
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidationExceptions(e: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
+        val error = e.bindingResult.allErrors.firstOrNull()
+            ?.defaultMessage ?: "Validation failed"
+
+        return ResponseEntity(
+            ErrorResponse(
+                status = HttpStatus.BAD_REQUEST.value(),
+                error = "Validation Failed",
+                message = error
+            ),
+            HttpStatus.BAD_REQUEST
         )
     }
 
@@ -40,6 +57,19 @@ class GlobalExceptionHandler {
                 status = HttpStatus.BAD_REQUEST.value(),
                 error = HttpStatus.BAD_REQUEST.reasonPhrase,
                 message = "Type of ${e.requiredType?.simpleName} was expected"
+            ),
+            HttpStatus.BAD_REQUEST
+        )
+    }
+
+    // Illegal argument errors
+    @ExceptionHandler(IllegalArgumentException::class)
+    fun handleTypeMismatchErrors(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(
+            ErrorResponse(
+                status = HttpStatus.BAD_REQUEST.value(),
+                error = HttpStatus.BAD_REQUEST.reasonPhrase,
+                message = e.message
             ),
             HttpStatus.BAD_REQUEST
         )
@@ -73,5 +103,6 @@ class GlobalExceptionHandler {
 }
 
 class ResourceNotFoundException(message: String) : RuntimeException(message)
-class InsufficientBalanceException(message: String) : RuntimeException(message)
+class InsufficientFundsException(message: String) : RuntimeException(message)
+class InvalidAmountException(message: String) : RuntimeException(message)
 class DuplicateFieldException(message: String) : RuntimeException(message)
