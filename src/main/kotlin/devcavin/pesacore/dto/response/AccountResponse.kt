@@ -9,7 +9,7 @@ data class AccountResponse(
     val id: UUID?,
     val accountNumber: String,
     val ownerId: String,
-    val balance: BigDecimal,
+    val balance: BigDecimal?,
     val currency: String,
     val createdAt: Instant,
     val updatedAt: Instant

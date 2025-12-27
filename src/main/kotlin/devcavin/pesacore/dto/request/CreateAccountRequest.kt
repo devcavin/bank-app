@@ -8,7 +8,7 @@ import java.math.BigDecimal
 data class CreateAccountRequest(
     @field:NotNull(message = "Balance is required")
     @field:DecimalMin(value = "0.0", message = "Balance cannot be negative", inclusive = true)
-    var balance: BigDecimal
+    var balance: BigDecimal? = null
 )
 
 fun CreateAccountRequest.toAccountEntity(): Account {

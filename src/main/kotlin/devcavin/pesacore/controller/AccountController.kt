@@ -1,8 +1,11 @@
 package devcavin.pesacore.controller
 
 import devcavin.pesacore.dto.request.CreateAccountRequest
+import devcavin.pesacore.dto.request.TransactionRequest
 import devcavin.pesacore.dto.response.AccountResponse
+import devcavin.pesacore.dto.response.TransactionResponse
 import devcavin.pesacore.service.AccountService
+import devcavin.pesacore.service.TransactionService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,9 +19,12 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/v1/accounts")
-class AccountController(private val accountService: AccountService) {
+class AccountController(
+    private val accountService: AccountService,
+    private val transactionService: TransactionService
+) {
     @PostMapping
-    fun createAccount(@RequestBody request: CreateAccountRequest): ResponseEntity<AccountResponse> {
+    fun createAccount(@Valid @RequestBody request: CreateAccountRequest): ResponseEntity<AccountResponse> {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.createAccount(request))
     }
 
@@ -31,8 +37,23 @@ class AccountController(private val accountService: AccountService) {
     }
 
     @GetMapping("/{id}")
-    fun accountById(@Valid @PathVariable id: UUID): ResponseEntity<AccountResponse> {
+    fun accountById(@PathVariable id: UUID): ResponseEntity<AccountResponse> {
         return ResponseEntity.status(HttpStatus.OK)
             .body(accountService.accountById(id))
+    }
+
+    @PostMapping("/{accountId}/transactions/deposit")
+    fun deposit(@PathVariable accountId: UUID, @Valid @RequestBody request: TransactionRequest):
+            ResponseEntity<TransactionResponse> {
+        return ResponseEntity(
+            transactionService.deposit(accountId, request),
+            HttpStatus.OK
+        )
+    }
+
+    @PostMapping("/{accountId}/transactions/withdraw")
+    fun withdraw(@PathVariable accountId: UUID, @Valid @RequestBody request: TransactionRequest):
+            ResponseEntity<TransactionResponse> {
+        return ResponseEntity.status(HttpStatus.OK).body(transactionService.withdraw(accountId, request))
     }
 }
